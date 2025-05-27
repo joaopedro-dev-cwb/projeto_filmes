@@ -1,0 +1,18 @@
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    
+    # Base path - ajuste conforme sua instalação local
+    # Se estiver diretamente na raiz do localhost:
+    RewriteBase /
+    
+    # Se estiver em uma subpasta (ex: http://localhost/projeto_filmes/)
+    # RewriteBase /projeto_filmes/public/
+    
+    # Permite acesso a arquivos estáticos (CSS, JS, imagens)
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_URI} !\.(css|js|png|jpg|jpeg|gif|ico|svg|woff|woff2)$ [NC]
+    
+    # Redireciona todas as requisições para index.php
+    RewriteRule ^(.*)$ index.php?action=$1 [QSA,L]
+</IfModule>
