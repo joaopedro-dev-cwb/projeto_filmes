@@ -7,7 +7,7 @@
         <div class="alert alert-error"><?= htmlspecialchars($error) ?></div>
     <?php endif; ?>
 
-    <form action="/register" method="POST">
+    <form action="register" method="POST">
         <div class="form-group">
             <label for="name">Nome:</label>
             <input type="text" id="name" name="name" required>
@@ -16,6 +16,16 @@
         <div class="form-group">
             <label for="email">E-mail:</label>
             <input type="email" id="email" name="email" required>
+        </div>
+
+        <div class="form-group">
+            <label for="cpf">CPF:</label>
+            <input type="text" id="cpf" name="cpf" required>
+        </div>
+
+        <div class="form-group">
+            <label for="dtaNasc">Data de Nascimento:</label>
+            <input type="date" id="dtaNasc" name="dtaNasc" required>
         </div>
         
         <div class="form-group">
@@ -32,7 +42,7 @@
     </form>
     
     <div class="auth-links">
-        Já tem conta? <a href="/login">Faça login</a>
+        Já tem conta? <a href="login/">Faça login</a>
     </div>
 </div>
 

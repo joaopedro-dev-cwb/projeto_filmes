@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Tempo de geração: 27/05/2025 às 16:08
+-- Tempo de geração: 01/06/2025 às 17:02
 -- Versão do servidor: 10.4.32-MariaDB
 -- Versão do PHP: 8.2.12
 
@@ -20,6 +20,8 @@ SET time_zone = "+00:00";
 --
 -- Banco de dados: `filmes_php`
 --
+CREATE DATABASE IF NOT EXISTS `filmes_php` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+USE `filmes_php`;
 
 -- --------------------------------------------------------
 
@@ -62,7 +64,9 @@ CREATE TABLE `users` (
   `id` int(11) NOT NULL,
   `email` varchar(100) NOT NULL,
   `password` varchar(255) NOT NULL,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `cpf` varchar(11) NOT NULL,
+  `data_nascimento` date NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -88,7 +92,8 @@ ALTER TABLE `reviews`
 --
 ALTER TABLE `users`
   ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `email` (`email`);
+  ADD UNIQUE KEY `email` (`email`),
+  ADD UNIQUE KEY `cpf` (`cpf`);
 
 --
 -- AUTO_INCREMENT para tabelas despejadas

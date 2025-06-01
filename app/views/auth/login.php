@@ -7,7 +7,7 @@
         <div class="alert alert-error"><?= htmlspecialchars($error) ?></div>
     <?php endif; ?>
 
-    <form action="/login" method="POST">
+    <form action="login" method="POST">
         <div class="form-group">
             <label for="email">E-mail:</label>
             <input type="email" id="email" name="email" required>
@@ -22,7 +22,9 @@
     </form>
     
     <div class="auth-links">
-        <a href="/register">Criar nova conta</a> | 
-        <a href="/forgot-password">Esqueci minha senha</a>
+        <a href="register">Criar nova conta</a> | 
+        <a href="password">Esqueci minha senha</a>
     </div>
 </div
+
+<?php require_once __DIR__ . '/../partials/footer.php'; ?>
