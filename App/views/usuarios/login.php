@@ -1,4 +1,4 @@
-<?php require_once __DIR__ . '/../partials/header.php'; ?>
+<?php include '../App/views/header.php'; ?>
 
 <div class="auth-container">
     <h1>Login</h1>
@@ -22,9 +22,9 @@
     </form>
     
     <div class="auth-links">
-        <a href="register">Criar nova conta</a> | 
-        <a href="password">Esqueci minha senha</a>
+        <a href="">Criar nova conta</a> | 
+        <a href="">Esqueci minha senha</a>
     </div>
 </div
 
-<?php require_once __DIR__ . '/../partials/footer.php'; ?>
+<?php require_once __DIR__ . '/../App/views/footer.php'; ?>
