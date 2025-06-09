@@ -1,0 +1,22 @@
+# Allow access to static files
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /projeto_filmes/public/
+    
+    # If the request is for an existing file or directory, serve it directly
+    RewriteCond %{REQUEST_FILENAME} -f [OR]
+    RewriteCond %{REQUEST_FILENAME} -d
+    RewriteRule ^ - [L]
+    
+    # Otherwise, redirect to index.php
+    RewriteRule ^ index.php [L]
+</IfModule>
+
+# Ensure proper MIME types
+<IfModule mod_mime.c>
+    AddType text/css .css
+    AddType text/javascript .js
+    AddType image/jpeg .jpg .jpeg
+    AddType image/png .png
+    AddType image/gif .gif
+</IfModule>

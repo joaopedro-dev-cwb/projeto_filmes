@@ -5,55 +5,53 @@
         <h1><?= htmlspecialchars($film['title']) ?></h1>
         <span class="release-year">(<?= htmlspecialchars($film['release_year']) ?>)</span>
     </div>
-    
-    <div class="film-meta">
-        <span class="director">Diretor: <?= htmlspecialchars($film['director']) ?></span>
-        <span class="genre">Gênero: <?= htmlspecialchars($film['genre']) ?></span>
+      <div class="film-meta">
+        <span class="director">Director: <?= htmlspecialchars($film['director']) ?></span>
+        <span class="genre">Genre: <?= htmlspecialchars($film['genre']) ?></span>
     </div>
     
     <div class="film-synopsis">
-        <h2>Sinopse</h2>
+        <h2>Synopsis</h2>
         <p><?= nl2br(htmlspecialchars($film['description'])) ?></p>
     </div>
     
     <?php if (isset($_SESSION['user_id'])): ?>
         <div class="film-actions">
-            <a href="/films/edit/<?= $film['id'] ?>" class="btn btn-edit">Editar</a>
-            <form action="/films/delete/<?= $film['id'] ?>" method="POST" class="delete-form">
-                <button type="submit" class="btn btn-danger">Excluir</button>
+            <a href="?action=films/edit&id=<?= $film['id'] ?>" class="btn btn-edit">Edit</a>
+            <form action="?action=films/delete&id=<?= $film['id'] ?>" method="POST" class="delete-form">
+                <button type="submit" class="btn btn-danger">Delete</button>
             </form>
         </div>
     <?php endif; ?>
 </div>
 
-<!-- Seção de avaliações -->
+<!-- Reviews section -->
 <div class="reviews-section">
-    <h2>Avaliações</h2>
+    <h2>Reviews</h2>
     
     <?php if (isset($_SESSION['user_id'])): ?>
         <div class="add-review">
-            <h3>Deixe sua avaliação</h3>
-            <form action="/reviews/create" method="POST">
+            <h3>Leave your review</h3>
+            <form action="?action=reviews/create" method="POST">
                 <input type="hidden" name="film_id" value="<?= $film['id'] ?>">
                 
                 <div class="rating">
-                    <label>Avaliação:</label>
+                    <label>Rating:</label>
                     <select name="rating" required>
-                        <option value="">Selecione...</option>
-                        <option value="1">1 Estrela</option>
-                        <option value="2">2 Estrelas</option>
-                        <option value="3">3 Estrelas</option>
-                        <option value="4">4 Estrelas</option>
-                        <option value="5">5 Estrelas</option>
+                        <option value="">Select...</option>
+                        <option value="1">1 Star</option>
+                        <option value="2">2 Stars</option>
+                        <option value="3">3 Stars</option>
+                        <option value="4">4 Stars</option>
+                        <option value="5">5 Stars</option>
                     </select>
                 </div>
                 
-                <div class="form-group">
-                    <label for="comment">Comentário:</label>
+                <div class="form-group">                    <label for="comment">Comment:</label>
                     <textarea id="comment" name="comment" rows="4"></textarea>
                 </div>
                 
-                <button type="submit" class="btn btn-primary">Enviar Avaliação</button>
+                <button type="submit" class="btn btn-primary">Submit Review</button>
             </form>
         </div>
     <?php endif; ?>

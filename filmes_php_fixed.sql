@@ -11,13 +11,6 @@ SET time_zone = "+00:00";
 /*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
 /*!40101 SET NAMES utf8mb4 */;
 
---
--- Database: `filmes_php`
---
-DROP DATABASE IF EXISTS `filmes_php`;
-CREATE DATABASE `filmes_php` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
-USE `filmes_php`;
-
 -- Drop tables in correct order to avoid foreign key constraints
 DROP TABLE IF EXISTS `password_resets`;
 DROP TABLE IF EXISTS `reviews`;
@@ -25,6 +18,11 @@ DROP TABLE IF EXISTS `film_genres`;
 DROP TABLE IF EXISTS `films`;
 DROP TABLE IF EXISTS `genres`;
 DROP TABLE IF EXISTS `users`;
+
+--
+-- Database: `filmes_php`
+--
+CREATE DATABASE IF NOT EXISTS `filmes_php` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
 USE `filmes_php`;
 
 -- --------------------------------------------------------

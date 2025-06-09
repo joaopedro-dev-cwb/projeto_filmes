@@ -1,18 +1,16 @@
 <IfModule mod_rewrite.c>
-    RewriteEngine On
+    RewriteEngine On    # Base path - adjust according to your local installation
+    # If in a subfolder (e.g., http://localhost/projeto_filmes/)
+    RewriteBase /projeto_filmes/
     
-    # Base path - ajuste conforme sua instalação local
-    # Se estiver diretamente na raiz do localhost:
-    RewriteBase /
+    # Ensure static files are accessible
+    RewriteCond %{REQUEST_URI} !^/projeto_filmes/public/assets/
     
-    # Se estiver em uma subpasta (ex: http://localhost/projeto_filmes/)
-    # RewriteBase /projeto_filmes/public/
-    
-    # Permite acesso a arquivos estáticos (CSS, JS, imagens)
+    # Allow access to static files (CSS, JS, images)
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteCond %{REQUEST_URI} !\.(css|js|png|jpg|jpeg|gif|ico|svg|woff|woff2)$ [NC]
     
-    # Redireciona todas as requisições para index.php
+    # Redirect all requests to index.php
     RewriteRule ^(.*)$ index.php?action=$1 [QSA,L]
 </IfModule>

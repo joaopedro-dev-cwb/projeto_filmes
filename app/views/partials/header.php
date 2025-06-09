@@ -1,27 +1,31 @@
+<?php
+$config = require_once __DIR__ . '/../../config/config.dev.php';
+?>
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Catálogo de Filmes</title>
-    <link rel="stylesheet" href="/projeto_filmes/public/assets/css/style.css">
+    <title>Movies Catalog</title>
+    <link rel="stylesheet" href="<?= $config['asset_url'] ?>/css/style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <body>
     <header>
         <nav>
-            <!-- Link para Home -->
             <a href="?action=home">Home</a>
-            
-            <!-- Link para Login -->
-            <a href="?action=login">Login</a>
-            
-            <!-- Link para Registro -->
-            <a href="?action=register">Registrar</a>
-        
-            
-            <!-- Link para Logout (só mostra se logado) -->
-            <?php if(isset($_SESSION['user'])): ?>
-                <a href="?action=logout">Sair</a>
+            <?php if(!isset($_SESSION['user_id'])): ?>
+                <a href="?action=login">Login</a>
+                <a href="?action=register">Register</a>
+            <?php else: ?>
+                <a href="?action=films/create">Add Movie</a>
+                <a href="?action=logout">Logout</a>
             <?php endif; ?>
         </nav>
     </header>
-    <main>
+    <main class="container"><?php
+    if (isset($_SESSION['success_message'])): ?>
+        <div class="alert alert-success">
+            <?= htmlspecialchars($_SESSION['success_message']) ?>
+        </div>
+        <?php unset($_SESSION['success_message']);
+    endif; ?>

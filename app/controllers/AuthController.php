@@ -2,127 +2,184 @@
 require_once __DIR__ . '/../models/User.php';
 
 class AuthController {
+    private $viewsPath;
+
+    public function __construct() {
+        $this->viewsPath = __DIR__ . '/../views/';
+    }
+
+    private function startSession($user) {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+        $_SESSION['user_id'] = $user['id'];
+        $_SESSION['user_name'] = $user['name'];
+        $_SESSION['user_email'] = $user['email'];
+    }
+
     public function login() {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            if (empty($_POST['email']) || empty($_POST['password'])) {
+                $error = "Email and password are required";
+                require $this->viewsPath . 'auth/login.php';
+                return;
+            }
+
             $user = new User();
             $loggedUser = $user->login($_POST['email'], $_POST['password']);
             
             if ($loggedUser) {
-                session_start();
-                $_SESSION['user_id'] = $loggedUser['id'];
-                header('Location: /');
+                $this->startSession($loggedUser);
+                header('Location: /projeto_filmes/public/?action=home');
+                exit;
             } else {
-                $error = "Credenciais inválidas";
-                require_once '../views/auth/login.php';
+                $error = "Invalid credentials";
+                require $this->viewsPath . 'auth/login.php';
             }
         } else {
-            require_once '../views/auth/login.php';
+            require $this->viewsPath . 'auth/login.php';
         }
     }
 
     public function showLogin() {
-        require_once __DIR__ . '/../views/auth/login.php';
+        $viewFile = $this->viewsPath . 'auth/login.php';
+        require $viewFile;
     }
     
     public function handleLogin() {
-        // Lógica de autenticação
         $user = new User();
         $loggedUser = $user->login($_POST['email'], $_POST['password']);
         if ($loggedUser) {
-            session_start();
             $_SESSION['user_id'] = $loggedUser['id'];
-            header('Location: /?action=home');
+            header('Location: /projeto_filmes/public/?action=home');
             exit;
         } else {
-            $error = "Credenciais inválidas";
-            require_once __DIR__ . '/../views/auth/login.php';
+            $error = "Invalid credentials";
+            $viewFile = $this->viewsPath . 'auth/login.php';
+            require $viewFile;
         }
+    }    public function register() {
+        $viewFile = $this->viewsPath . 'auth/register.php';
+        require $viewFile;
     }
 
-    public function register() {
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $user = new User();
-            if ($user->register($_POST['email'], $_POST['password'])) {
-                header('Location: /login');
+    public function handleRegister() {
+        $requiredFields = ['email', 'password', 'cpf', 'birth_date', 'name'];
+        foreach ($requiredFields as $field) {
+            if (empty($_POST[$field])) {
+                $error = "All fields are required";
+                $viewFile = $this->viewsPath . 'auth/register.php';
+                require $viewFile;
+                return;
             }
-        } else {
-            require_once '../views/auth/register.php';
         }
-    }
 
-    public function handleRegister()
-    {
-        // Implement registration logic here
-        // Example:
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $username = $_POST['username'] ?? '';
-            $password = $_POST['password'] ?? '';
-            // Validate and save user, then redirect or show errors
+        if ($_POST['password'] !== $_POST['confirm_password']) {
+            $error = "Passwords do not match";
+            $viewFile = $this->viewsPath . 'auth/register.php';
+            require $viewFile;
+            return;
         }
+
+        $user = new User();
+        try {
+            if ($user->register($_POST)) {
+                header('Location: /projeto_filmes/public/?action=login');
+                exit;
+            } else {
+                $error = "Registration failed";
+            }
+        } catch (Exception $e) {
+            $error = $e->getMessage();
+        }
+        $viewFile = $this->viewsPath . 'auth/register.php';
+        require $viewFile;
     }
 
     public function showRegister() {
-        require_once __DIR__ . '/../views/auth/register.php';
+        $viewFile = $this->viewsPath . 'auth/register.php';
+        require $viewFile;
     }
 
     public function logout() {
-        session_start();
         session_destroy();
-        header('Location: /');
-    }
+        header('Location: /projeto_filmes/public/?action=home');
+        exit;
+    }    public function resetPassword() {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            if (empty($_POST['cpf']) || empty($_POST['birth_date']) || empty($_POST['new_password'])) {
+                $error = "All fields are required";
+                $viewFile = $this->viewsPath . 'auth/reset_password.php';
+                require $viewFile;
+                return;
+            }
 
-    public function recuperarSenha() {
-        $conn = new mysqli("localhost", "root", "", "filmes_php");
+            try {
+                $user = new User();
+                $success = $user->resetPassword(
+                    $_POST['cpf'],
+                    $_POST['birth_date'],
+                    $_POST['new_password']
+                );
 
-        if ($conn->connect_error) {
-            die("Conexão falhou: " . $conn->connect_error);
-        }
-
-        $cpf_teste = $_POST['cpf_teste'];
-        $dtaNasc_teste = $_POST['dtaNasc_teste'];
-        $nova_senha = $_POST['nova_senha'];
-
-        $resultado = $this->alterarSenha($cpf_teste, $dtaNasc_teste, $nova_senha, $conn);
-
-        echo $resultado['mensagem'];
-
-        $conn->close();
-    }
-
-    private function alterarSenha($cpf_teste, $dtaNasc_teste, $nova_senha, $conn) {
-        $novaSenhaHash = password_hash($nova_senha, PASSWORD_DEFAULT);
-
-        $sql = "SELECT * FROM users WHERE cpf = ? AND data_nascimento = ?";
-        $stmt = $conn->prepare($sql);
-        $stmt->bind_param("ss", $cpf_teste, $dtaNasc_teste);
-        $stmt->execute();
-        $result = $stmt->get_result();
-
-        if ($result->num_rows > 0) {
-            $sqlUpdate = "UPDATE usuarios SET password = ? WHERE cpf = ? AND data_nascimento = ?";
-            $stmtUpdate = $conn->prepare($sqlUpdate);
-            $stmtUpdate->bind_param("sss", $novaSenhaHash, $cpf_teste, $dtaNasc_teste);
-
-            if ($stmtUpdate->execute()) {
-                $stmtUpdate->close();
-                return [
-                    'status' => true,
-                    'mensagem' => 'Senha atualizada com sucesso.'
-                ];
-            } else {
-                $stmtUpdate->close();
-                return [
-                    'status' => false,
-                    'mensagem' => 'Erro ao atualizar a senha.'
-                ];
+                if ($success) {
+                    $_SESSION['success_message'] = "Password updated successfully";
+                    header('Location: /projeto_filmes/public/?action=login');
+                    exit;
+                } else {
+                    $error = "Failed to reset password. Please verify your information.";
+                    $viewFile = $this->viewsPath . 'auth/reset_password.php';
+                    require $viewFile;
+                }
+            } catch (Exception $e) {
+                $error = "An error occurred. Please try again.";
+                $viewFile = $this->viewsPath . 'auth/reset_password.php';
+                require $viewFile;
             }
         } else {
-            return [
-                'status' => false,
-                'mensagem' => 'CPF e Data de nascimento não encontrados.'
-            ];
+            $viewFile = $this->viewsPath . 'auth/reset_password.php';
+            require $viewFile;
         }
+    }
 
-        $stmt->close();
+    public function showResetPassword() {
+        $viewFile = $this->viewsPath . 'auth/reset_password.php';
+        require $viewFile;
+    }
+
+    public function handleResetPassword() {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            if (empty($_POST['cpf']) || empty($_POST['birth_date']) || empty($_POST['new_password'])) {
+                $error = "All fields are required";
+                $viewFile = $this->viewsPath . 'auth/reset_password.php';
+                require $viewFile;
+                return;
+            }
+
+            try {
+                $user = new User();
+                $result = $user->resetPassword(
+                    $_POST['cpf'],
+                    $_POST['birth_date'],
+                    $_POST['new_password']
+                );
+
+                if ($result) {
+                    $_SESSION['success_message'] = "Password updated successfully";
+                    header('Location: /projeto_filmes/public/?action=login');
+                    exit;
+                } else {
+                    $error = "Failed to reset password. Please verify your information.";
+                    $viewFile = $this->viewsPath . 'auth/reset_password.php';
+                    require $viewFile;
+                }
+            } catch (Exception $e) {
+                $error = "An error occurred. Please try again.";
+                $viewFile = $this->viewsPath . 'auth/reset_password.php';
+                require $viewFile;
+            }
+        } else {
+            $this->showResetPassword();
+        }
     }
 }

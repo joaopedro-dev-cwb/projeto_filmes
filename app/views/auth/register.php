@@ -1,20 +1,19 @@
 <?php require_once __DIR__ . '/../partials/header.php'; ?>
 
-<div class="auth-container">
-    <h1>Criar Conta</h1>
+<div class="auth-container">    <h1>Create Account</h1>
     
     <?php if (isset($error)): ?>
         <div class="alert alert-error"><?= htmlspecialchars($error) ?></div>
     <?php endif; ?>
 
-    <form action="register" method="POST">
+    <form action="?action=register" method="POST">
         <div class="form-group">
-            <label for="name">Nome:</label>
+            <label for="name">Name:</label>
             <input type="text" id="name" name="name" required>
         </div>
         
         <div class="form-group">
-            <label for="email">E-mail:</label>
+            <label for="email">Email:</label>
             <input type="email" id="email" name="email" required>
         </div>
 
@@ -24,25 +23,25 @@
         </div>
 
         <div class="form-group">
-            <label for="dtaNasc">Data de Nascimento:</label>
-            <input type="date" id="dtaNasc" name="dtaNasc" required>
+            <label for="birth_date">Birth Date:</label>
+            <input type="date" id="birth_date" name="birth_date" required>
         </div>
         
         <div class="form-group">
-            <label for="password">Senha:</label>
+            <label for="password">Password:</label>
             <input type="password" id="password" name="password" required minlength="6">
         </div>
         
         <div class="form-group">
-            <label for="confirm_password">Confirmar Senha:</label>
+            <label for="confirm_password">Confirm Password:</label>
             <input type="password" id="confirm_password" name="confirm_password" required>
         </div>
         
-        <button type="submit" class="btn btn-primary">Registrar</button>
+        <button type="submit" class="btn btn-primary">Register</button>
     </form>
     
     <div class="auth-links">
-        Já tem conta? <a href="login/">Faça login</a>
+        Already have an account? <a href="?action=login">Login</a>
     </div>
 </div>
 
