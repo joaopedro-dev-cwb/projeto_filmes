@@ -28,6 +28,12 @@
             <label for="description">Description:</label>
             <textarea id="description" name="description" rows="4"><?= htmlspecialchars($film['description']) ?></textarea>
         </div>
+
+        <div class="form-group">
+            <label for="director">Director:</label>
+            <input type="text" id="director" name="director"
+                value="<?= htmlspecialchars($film['director']) ?>" required>
+        </div>
         
         <div class="form-group">
             <label for="release_year">Release Year:</label>

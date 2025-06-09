@@ -153,6 +153,7 @@ class FilmController {
                 $data = [
                     'title' => $_POST['title'] ?? '',
                     'description' => $_POST['description'] ?? '',
+                    'director' => $_POST['director'] ?? '',
                     'release_year' => $_POST['release_year'] ?? '',
                     'duration' => $_POST['duration'] ?? '',
                     'genres' => $_POST['genres'] ?? []

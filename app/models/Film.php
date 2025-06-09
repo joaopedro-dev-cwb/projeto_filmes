@@ -88,6 +88,11 @@ class Film {
             $this->db->beginTransaction();
 
             $coverPath = $file ? $this->handleFileUpload($file) : null;
+            
+            if ($coverPath) {
+                $absolutePath = $_SERVER['DOCUMENT_ROOT'] . '/projeto_filmes/public/' . $coverPath;
+                $this->resizeImage($absolutePath);
+            }
 
             $stmt = $this->db->prepare("
                 INSERT INTO films (title, description, director, release_year, duration, cover_image, user_id)
@@ -117,7 +122,7 @@ class Film {
             $this->db->commit();
             return $filmId;
         } catch (Exception $e) {
-            $this->db->rollBack();
+            $this->safeRollback();
             throw $e;
         }
     }
@@ -133,25 +138,24 @@ class Film {
             }
 
             $coverPath = $file ? $this->handleFileUpload($file) : $film['cover_image'];
-            
+
             // If new file uploaded, delete old one
-            if ($file && $film['cover_image']) {
-                $oldFilePath = $_SERVER['DOCUMENT_ROOT'] . '/projeto_filmes/public/' . $film['cover_image'];
-                if (file_exists($oldFilePath)) {
-                    unlink($oldFilePath);
-                }
+            if ($file && $coverPath) {
+                $absolutePath = $_SERVER['DOCUMENT_ROOT'] . '/projeto_filmes/public/' . $coverPath;
+                $this->resizeImage($absolutePath);
             }
 
             $stmt = $this->db->prepare("
                 UPDATE films 
-                SET title = ?, description = ?, release_year = ?, 
+                SET title = ?, description = ?, director = ?, release_year = ?, 
                     duration = ?, cover_image = ?
                 WHERE id = ?
             ");
-            
+
             $stmt->execute([
                 $data['title'],
                 $data['description'],
+                $data['director'],      // <-- Adicione esta linha!
                 $data['release_year'],
                 $data['duration'],
                 $coverPath,
@@ -171,7 +175,7 @@ class Film {
             $this->db->commit();
             return true;
         } catch (Exception $e) {
-            $this->db->rollBack();
+            $this->safeRollback();
             throw $e;
         }
     }
@@ -202,7 +206,7 @@ class Film {
             $this->db->commit();
             return true;
         } catch (Exception $e) {
-            $this->db->rollBack();
+            $this->safeRollback();
             throw $e;
         }
     }
@@ -245,6 +249,45 @@ class Film {
         return $this->uploadDir . $filename;
     }
 
+        private function resizeImage($filePath, $width = 400, $height = 600) {
+        $info = getimagesize($filePath);
+        if (!$info) return false;
+
+        switch ($info['mime']) {
+            case 'image/jpeg':
+                $src = imagecreatefromjpeg($filePath);
+                break;
+            case 'image/png':
+                $src = imagecreatefrompng($filePath);
+                break;
+            case 'image/webp':
+                $src = imagecreatefromwebp($filePath);
+                break;
+            default:
+                return false;
+        }
+
+        $dst = imagecreatetruecolor($width, $height);
+        imagecopyresampled($dst, $src, 0, 0, 0, 0, $width, $height, imagesx($src), imagesy($src));
+
+        // Salva a imagem redimensionada sobrescrevendo o arquivo original
+        switch ($info['mime']) {
+            case 'image/jpeg':
+                imagejpeg($dst, $filePath, 90);
+                break;
+            case 'image/png':
+                imagepng($dst, $filePath, 9);
+                break;
+            case 'image/webp':
+                imagewebp($dst, $filePath, 90);
+                break;
+        }
+
+        imagedestroy($src);
+        imagedestroy($dst);
+        return true;
+    }
+
     private function getUploadError($code) {
         switch ($code) {
             case UPLOAD_ERR_INI_SIZE:
@@ -282,4 +325,10 @@ class Film {
         $stmt->execute([$genre]);
         return $stmt->fetchAll();
     }
+
+    private function safeRollback() {
+    if ($this->db->inTransaction()) {
+        $this->db->rollBack();
+    }
+}
 }
